@@ -26,7 +26,7 @@
 | interval  | Интервал проверки (в секундах) |
 | files  | Список файлов для мониторинга   |
 | auto_start  |  Включить автозапуск при загрузке  |
-## Примеры
+### Примеры
 ```bash
    kyskus-checker get all  
    sudo kyskus-checker set interval 30  

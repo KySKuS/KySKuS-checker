@@ -26,3 +26,9 @@
 | interval  | Интервал проверки (в секундах) |
 | files  | Список файлов для мониторинга   |
 | auto_start  |  Включить автозапуск при загрузке  |
+## Примеры
+kyskus-checker get all
+sudo kyskus-checker set interval 30
+sudo kyskus-checker set files /etc/passwd,/etc/hosts
+sudo kyskus-checker set auto_start true   # включить автозапуск
+sudo kyskus-checker set auto_start false  # выключить автозапуск

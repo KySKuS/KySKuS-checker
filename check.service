@@ -1,0 +1,10 @@
+[Unit]
+Description=KySKuS-checker
+After=multi-user.target
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/check.sh
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target

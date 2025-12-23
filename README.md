@@ -12,7 +12,7 @@
 1. Соберите RPM:
    ```bash
    sudo dnf install -y rpm-build rpmdevtools
-   git clone https://github.com/KySKuS/KySKuS-checker.git
+   git clone https://github.com/KySKuS/KySKuS-checker
    cd KySKuS_checker
    mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
    cp check.sh kyskus-checker check.service ~/rpmbuild/SOURCES/

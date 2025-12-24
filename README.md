@@ -14,7 +14,6 @@
    sudo dnf install -y git rpm-build dnf-plugins-core
    git clone https://github.com/KySKuS/KySKuS_checker.git
  # распакуйте архив 
-    ```bash
    cd KySKuS_checker
    rpmbuild \
    --buildroot "$(pwd)/root" \

@@ -14,6 +14,7 @@
    sudo dnf install -y git rpm-build dnf-plugins-core
    git clone https://github.com/kyskus-13-70/KySKuS_checker.git
    cd KySKuS_checker
+   ```bash
    rpmbuild \
   --buildroot "$(pwd)/root" \
   --define "_topdir $(pwd)" \

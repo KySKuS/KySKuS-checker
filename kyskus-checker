@@ -1,0 +1,101 @@
+#!/bin/bash
+
+CONFIG="/etc/KySKuS_checker.conf"
+SERVICE="check"
+
+# Создаём конфиг
+if [[ ! -f "$CONFIG" ]]; then
+    cat > "$CONFIG" << INIT
+INTERVAL=60
+FILES=/etc/passwd,/etc/group,/etc/sudoers
+LOG_ENABLED=true
+AUTO_START=true
+INIT
+    chmod 600 "$CONFIG"
+    chown root:root "$CONFIG"
+fi
+
+show_help() {
+    echo "Usage: kyskus-checker [get|set] <option> [value]"
+    echo "Options:"
+    echo "  interval    - set check interval (seconds)"
+    echo "  files       - set files to monitor (comma-separated, NO spaces)"
+    echo "  log         - enable/disable logging (true/false)"
+    echo "  auto_start  - enable/disable autostart (true/false)"
+    echo "  all         - show all settings"
+}
+
+apply_autostart() {
+    if [[ "$1" == "true" ]]; then
+        systemctl enable --quiet "$SERVICE"
+        echo "Автостарт+"
+    else
+        systemctl disable --quiet "$SERVICE"
+        echo "Автостарт-"
+    fi
+}
+
+update_baseline() {
+    # Читаем список файлов
+    if [[ -f "$CONFIG" ]]; then
+        FILES_LINE=$(grep "^FILES=" "$CONFIG" | cut -d= -f2-)
+        if [[ -n "$FILES_LINE" ]]; then
+            IFS=',' read -r -a FILES <<< "$FILES_LINE"
+            mkdir -p /var/lib/check/backups
+            # Обновляем копии
+            for file in "${FILES[@]}"; do
+                if [[ -f "$file" ]]; then
+                    cp "$file" "/var/lib/check/backups/$(basename "$file").orig"
+                fi
+            done
+            sha256sum "${FILES[@]}" > /var/lib/check/baseline.sha256
+            chmod 600 /var/lib/check/baseline.sha256
+            chown root:root /var/lib/check/baseline.sha256
+            echo "Updated"
+        fi
+    fi
+}
+
+case "$1" in
+    get)
+        cat "$CONFIG"
+        ;;
+    set)
+        if [[ -z "$2" || -z "$3" ]]; then show_help; exit 1; fi
+        KEY=$(echo "$2" | tr '[:lower:]' '[:upper:]')
+        case "$KEY" in
+            INTERVAL)
+                if [[ "$3" =~ ^[0-9]+$ && "$3" -gt 0 ]]; then
+                    sed -i "s/^INTERVAL=.*/INTERVAL=$3/" "$CONFIG"
+                else echo "Error"; exit 1; fi
+                ;;
+            FILES)
+                if [[ "$3" == *,* && "$3" != *\ * ]]; then
+                    sed -i "s|^FILES=.*|FILES=$3|" "$CONFIG"
+                    update_baseline
+                else echo "Error"; exit 1; fi
+                ;;
+            LOG)
+                if [[ "$3" == "true" || "$3" == "false" ]]; then
+                    sed -i "s|^LOG_ENABLED=.*|LOG_ENABLED=$3|" "$CONFIG"
+                else echo "Error"; exit 1; fi
+                ;;
+            AUTO_START)
+                if [[ "$3" == "true" || "$3" == "false" ]]; then
+                    sed -i "s|^AUTO_START=.*|AUTO_START=$3|" "$CONFIG"
+                    apply_autostart "$3"
+                else echo "Error"; exit 1; fi
+                ;;
+            *) echo "Unknown option: $2"; show_help; exit 1; ;;
+        esac
+
+        if [[ "$KEY" != "AUTO_START" ]]; then
+            systemctl is-active --quiet "$SERVICE" && systemctl restart "$SERVICE"
+            echo "Updated"
+        fi
+        ;;
+    *)
+        show_help
+        exit 1
+        ;;
+esac

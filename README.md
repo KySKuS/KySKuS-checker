@@ -42,6 +42,7 @@ sudo rm -rf /var/lib/check
 
 ### Примеры
 ```bash
+echo "# ALARM" | sudo tee -a /etc/hosts
    kyskus-checker get all  
    sudo kyskus-checker set interval 30  
    sudo kyskus-checker set files /etc/passwd,/etc/hosts  

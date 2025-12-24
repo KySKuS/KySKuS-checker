@@ -15,11 +15,11 @@
    git clone https://github.com/KySKuS/KySKuS_checker.git
  ### распакуйте архив  
     ```bash  
-   cd KySKuS_checker
-   rpmbuild \
-   --buildroot "$(pwd)/root" \
-   --define "_topdir $(pwd)" \
-   -bb KySKuS_checker.spec
+    cd KySKuS_checker
+    rpmbuild \
+    --buildroot "$(pwd)/root" \
+    --define "_topdir $(pwd)" \
+    -bb KySKuS_checker.spec
   # После установки
      
      sudo dnf install -y RPMS/noarch/KySKuS_checker-*.rpm

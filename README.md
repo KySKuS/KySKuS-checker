@@ -19,7 +19,7 @@
    --define "_topdir $(pwd)" \
    -bb KySKuS_checker.spec
   # После установки
-     ```bash
+     
      sudo dnf install -y RPMS/noarch/KySKuS_checker-*.rpm
   
 # Настройка и управление
